@@ -77,6 +77,10 @@ def dataframe_union(stock_dfs, daily_sentiments):
         
         # Iterate over tickers
         for ticker, df in stock_dfs.items():
+            if ticker == "ALRS":
+                print(d)
+                print(df)
+                
             date, open, close, tick, r0, r1, r7, r30 = df[df['Date'] == d].values[0]
             
             row = [d, tick, open, r0, r1, r7, r30] # Get the date and stock ticker

@@ -39,7 +39,7 @@ def fetch_stock_data(stock_meta, rel_stock_path):
         try:
             stock_dfs[s] = pd.read_csv(f"{abs_stock_path}/stocks/{s}.csv")
         except Exception:
-            print(f"Error with stock: {s}")
+            print(f"Error retrieving stock: {s}")
     
     #Just formatting for cleaner output clarity
     print()
@@ -68,25 +68,38 @@ def prep_stock_data(stock_dfs):
         df = stock_dfs[s].copy()
 
         df['Ticker'] = s
-
         df['Date'] = pd.to_datetime(df['Date'])
+        
         df = df[df['Date'] >= pd.Timestamp("2012-01-28")].reset_index(drop=True)
         df = df.drop(['High', 'Low', 'Adj Close', 'Volume'], axis=1)
 
-        if df.shape[0] != 2057: # 2057 dates 2012-01-28 and 2020-04-01, cut unfilled stocks
+        # 2057 dates 2012-01-28 and 2020-04-01, cut unfilled stocks
+        if df.shape[0] != 2057:
             continue
-
-        df['r_0d'] = (df['Close'] - df['Open'])/df['Open']
+        
+        # Remove invalid or volatile stocks (0, negative, penny)
+        df = df[(df['Open'] > 0.5) & (df['Close'] > 0.5)]
+        
+        if df.shape[0] < 2057:
+            continue
+        
+        df['r_0d'] = (df['Close'] - df['Open']) / df['Open']
         df['r_1d'] = (df['Close'].shift(-1) - df['Close']) / df['Close']
         df['r_7d'] = (df['Close'].shift(-7) - df['Close']) / df['Close']
         df['r_30d'] = (df['Close'].shift(-30) - df['Close']) / df['Close']
-
+        
+        if df['r_1d'].abs().max() > 100:
+            print(f"Dropping {s}: invalid 1 day return")
+            continue
+        
+        df = df.dropna().reset_index(drop=True)
+        
         processed_stocks[s] = df
 
-    print(f"Number of Stocks before processing: \t{len(stock_dfs)}")
+    print(f"\nNumber of Stocks before processing: \t{len(stock_dfs)}")
     print(f"Number of Stocks after processing: \t{len(processed_stocks)}\n")
 
-    return {k: v.dropna().reset_index(drop=True) for k, v in processed_stocks.items()}
+    return processed_stocks
 
 
 """
