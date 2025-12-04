@@ -77,9 +77,9 @@ def prep_stock_data(stock_dfs):
             continue
 
         df['r_0d'] = (df['Close'] - df['Open'])/df['Open']
-        df['r_1d'] = df['Close'].shift(-1).pct_change(periods=1, fill_method=None)
-        df['r_7d'] = df['Close'].shift(-7).pct_change(periods=7, fill_method=None)
-        df['r_30d'] = df['Close'].shift(-30).pct_change(periods=30, fill_method=None)
+        df['r_1d'] = (df['Close'].shift(-1) - df['Close']) / df['Close']
+        df['r_7d'] = (df['Close'].shift(-7) - df['Close']) / df['Close']
+        df['r_30d'] = (df['Close'].shift(-30) - df['Close']) / df['Close']
 
         processed_stocks[s] = df
 
