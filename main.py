@@ -41,7 +41,7 @@ print("\nFinal dataset ready for modeling.\n")
 #===============================#===================================#
 #                   XGBoost Modeling Pipeline
 #===============================#===================================#
-x_features = ['Open'] + list(news_dataframe['category'].unique())    # Generate feature list for XGBoost
+x_features = ['Open'] + list(cleaned_news_data['category'].unique())    # Generate feature list for XGBoost
 X = final_dataframe[x_features] # Input features
 
 y_0d = final_dataframe['r_0d']  # Target variable: 0 day return
@@ -58,10 +58,10 @@ OBJECTIVE = 'reg:squarederror'
 METHOD = 'hist'
 
 # ====================== 0 Day Return Model ====================== #   
-if os.path.exists("xgb_models/xgb_model_0d.json"):
+if os.path.exists("xgb_models/xgb_model_0d.json") and False:   # Disabled due to model not saving evaluation results properly
     print(f"\nLoading pre-trained 0 day return model...")
     model_0d = xgb.Booster()
-    model_0d = xgb.Booster.load_model()
+    model_0d = model_0d.load_model("xgb_models/xgb_model_0d.json")
 else:
     print(f"\nTraining new 0 day return model...")
     X_train0, X_test0, y_train0, y_test0 = train_test_split(X, y_0d, test_size=0.2, random_state=42)
@@ -79,10 +79,10 @@ else:
     )
 
 # ====================== 1 Day Return Model ====================== #   
-if os.path.exists("xgb_models/xgb_model_1d.json"):
+if os.path.exists("xgb_models/xgb_model_1d.json") and False:   # Disabled due to model not saving evaluation results properly
     print(f"\nLoading pre-trained 1 day return model...")
     model_1d = xgb.Booster()
-    model_1d = xgb.Booster.load_model()
+    model_1d = model_1d.load_model("xgb_models/xgb_model_1d.json")
 else:
     print(f"\nTraining new 1 day return model...")
     X_train1, X_test1, y_train1, y_test1 = train_test_split(X, y_1d, test_size=0.2, random_state=42)
@@ -100,10 +100,10 @@ else:
     )
 
 # ====================== 7 Day Return Model ====================== #   
-if os.path.exists("xgb_models/xgb_model_7d.json"):
+if os.path.exists("xgb_models/xgb_model_7d.json") and False:   # Disabled due to model not saving evaluation results properly
     print(f"\nLoading pre-trained 7 day return model...")
     model_7d = xgb.Booster()
-    model_7d = xgb.Booster.load_model()
+    model_7d = model_7d.load_model("xgb_models/xgb_model_7d.json")
 else:
     print(f"\nTraining new 7 day return model...")
     X_train7, X_test7, y_train7, y_test7 = train_test_split(X, y_7d, test_size=0.2, random_state=42)
@@ -121,10 +121,10 @@ else:
     )
 
 # ====================== 30 Day Return Model ====================== #   
-if os.path.exists("xgb_models/xgb_model_30d.json"):
+if os.path.exists("xgb_models/xgb_model_30d.json") and False:   # Disabled due to model not saving evaluation results properly
     print(f"\nLoading pre-trained 30 day return model...")
     model_30d = xgb.Booster()
-    model_30d = xgb.Booster.load_model()
+    model_30d = model_30d.load_model("xgb_models/xgb_model_30d.json")
 else:
     print(f"\nTraining new 30 day return model...")
     X_train30, X_test30, y_train30, y_test30 = train_test_split(X, y_30d, test_size=0.2, random_state=42)
@@ -151,6 +151,8 @@ eval_7 = model_7d.evals_result()['validation_0']
 eval_30 = model_30d.evals_result()['validation_0']
 
 # =====================  RMSE Evaluation ========================== #
+os.makedirs('figures', exist_ok=True)
+
 print("\nCalculating RMSE for each model...")
 print(f"0 Day Return RMSE: {eval_0['rmse'][-1]:.6f}")
 print(f"1 Day Return RMSE: {eval_1['rmse'][-1]:.6f}")
