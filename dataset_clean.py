@@ -6,17 +6,20 @@ import helper_funcs as hf
 #==================================================================#
 #                   Dataset Cleaning Functions
 #==================================================================#
-
-"""
-    Function for cleaning and organizing stock information.
-        Drop irrelevant columns --> High, Low, Volume, adj_close
-        Drop information prior to 2012-01-28
-        Create stock return time horizon features
-    
-    args -> list of raw stock dataframes
-    rets -> list of cleaned stock dataframes
-"""
 def prep_stock_data(stock_dfs):
+    """ Prepare the stock datasets.
+            Filter dates to before after 2012-01-28 and before 2020-04-01.
+            Drop unnecessary columns.
+            Filter out invalid stocks.
+            Calculate return columns.
+
+        args:
+            news_df       -> Raw news dataframe (pd.DataFrame)
+            stock_dfs     -> Stock dataframes (Dict[str, pd.DataFrame)
+        
+        rets:
+            Cleaned news dataframe (pd.DataFrame)
+    """
     processed_stocks = {}
     tickers = stock_dfs.keys()
 
@@ -58,16 +61,19 @@ def prep_stock_data(stock_dfs):
     return processed_stocks
 
 
-"""
-    Function to clean and prep news dataframe for sentiment analysis.
-        News DF starts 2022-09-23, ends 2012-01-28 --> First must reverse dataset
-        Drop categories to only necessary --> Category, Headline, Date
-        Shift dates to align with trading days, skipping weekends and holidays till next open day
-    
-    args -> raw news dataframe and dictionary of stock dataframes
-    rets -> cleaned dataframe containing news content
-"""
 def prep_news_data(news_df, stock_dfs):
+    """ Clean the news dataset.
+            Drop irrelevant columns.
+            Set effective dates for news articles based on next trading day.
+            Clean naming issues.
+
+        args:
+            news_df       -> Raw news dataframe (pd.DataFrame)
+            stock_dfs     -> Stock dataframes (Dict[str, pd.DataFrame)
+        
+        rets:
+            Cleaned news dataframe (pd.DataFrame)
+    """
     news_df = news_df.sort_values(by='date', ascending=True).reset_index(drop=True)
     news_df = news_df.drop(['link', 'short_description', 'authors'], axis=1)
     news_df = news_df[news_df['date'] <= pd.Timestamp("2020-04-01")].reset_index(drop=True)
@@ -87,23 +93,15 @@ def prep_news_data(news_df, stock_dfs):
 #==================================================================#
 #                      Dataset Concatenation
 #==================================================================#
-"""
-
-"""
 def dataframe_union(stock_dfs, daily_sentiments):
-    """
-        At this point:
-            - stock_dfs: dictionary with ticker as key, DF as value
-                - Gather list of tickers being used through stock_dfs.keys()
-                - stock_dfs[...]
-                    - Date, Open, Close, Ticker, r_0d, r_1d, r_7d, r_30d
-            - daily_sentiment: DF holding sentiment scores
-                - date, category (42 total), avg_sentiment, article_count
+    """ Join sentiment data and stock dataframes into one larger dataframe.
+
+        args:
+            stock_dfs     -> Dictionary of  (Dict[str, pd.DataFrame])
+            daily_sentiments -> Dataframe of daily sentiment scores (pd.DataFrame)
         
-        The plan:
-            - For each time horizon create an XGBoost Model
-                - Each model gets all 3511 stock openings and the scores of that day
-                    - Target is the designated time horizon of that modelSo 
+        rets:
+            Merged dataframe of stock data and sentiment scores (pd.DataFrame)
     """
     all_rows = []
     

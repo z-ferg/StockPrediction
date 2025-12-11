@@ -15,7 +15,6 @@ def fetch_datasets(news_zip_path, stock_zip_path, news_extract_path, stock_extra
     rets:
         None
     """
-
     # Create extraction directories if they do not exist
     news_parent = os.path.dirname(news_extract_path) or '.'
     stock_parent = os.path.dirname(stock_extract_path) or '.'

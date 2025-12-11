@@ -5,10 +5,17 @@ import pandas as pd
 #==================================================================#
 #                   Sentiment Analysis Modeling
 #==================================================================#
-"""
-
-"""
 def sentiment_analysis(news_df):
+    """ Generate sentiment analysis on news headlines.
+            Apply TextBlob sentiment analysis on each headline.
+            Aggregate daily average sentiment scores by category.
+
+        args:
+            news_df       -> Cleaned news dataframe (pd.DataFrame)
+        
+        rets:
+            Sentiment dataframe with daily average sentiment scores by category (pd.DataFrame)
+    """
     # Create sentiment of each headline using 
     news_df['sentiment'] = news_df['headline'].apply(lambda x: TextBlob(x).sentiment.polarity)
 
