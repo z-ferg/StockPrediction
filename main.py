@@ -41,7 +41,7 @@ print("\nFinal dataset ready for modeling.\n")
 #===============================#===================================#
 #                   XGBoost Modeling Pipeline
 #===============================#===================================#
-x_features = ['Open'] + list(news_dataframe['cateory'].unique())    # Generate feature list for XGBoost
+x_features = ['Open'] + list(news_dataframe['category'].unique())    # Generate feature list for XGBoost
 X = final_dataframe[x_features] # Input features
 
 y_0d = final_dataframe['r_0d']  # Target variable: 0 day return
